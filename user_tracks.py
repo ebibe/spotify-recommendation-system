@@ -4,7 +4,7 @@ import spotify_tracks as spotify_tracks
 import sqlite3
 
 if __name__ == "__main__":
-    results = sp.current_user_top_tracks(limit=1000, offset=0,time_range='short_term') # Get the top 1000 songs from the user
+    results = sp.current_user_top_tracks(limit=50, offset=0,time_range='short_term') # Get the top 1000 songs from the user
 
     # Convert it to Dataframe
     track_name = []
@@ -66,11 +66,14 @@ if __name__ == "__main__":
 
     df_fav = pd.DataFrame(fav_tracks, columns = ['track_id', 'name', 'album', 'artist', 'release_date', 'length', 'popularity', 'danceability', 'acousticness', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'tempo', 'time_signature'])
     print("Number of rows in User_tracks DataFrame:", len(df_fav))
-    print(df_fav)
+    #print(df_fav)
+
+    # Dropping columns that could lead to data leakage
+    df_fav = df_fav.drop(columns=['name', 'album', 'artist', 'release_date'])
 
     # Creating favorite column to use in classification
     df_fav['favorite'] = 1
-    
+
     conn = sqlite3.connect('all.db') # creates a database connection
 
 

@@ -19,7 +19,9 @@ def get_playlist_ids(username):
 
 def getTrackIDs(playlist_id):
     ids = []
-    playlist = sp.user_playlist('spotify', playlist_id)
+
+    print('il problema è accedere alle informazioni delle singole playlist')
+    playlist = sp.playlist(playlist_id)
 
     for item in playlist['tracks']['items'][:50]: # only get the first 50 tracks
         track = item['track']
@@ -84,14 +86,23 @@ def fetch_spotify_data():
 
     # Step 0: Get playlist IDs
     playlist_ids = get_playlist_ids('spotify')
+    print(f'numero di playlist di spotify prese: {len(playlist_ids)}')
+
 
 
 
     # Step 2: Fetch track IDs from the playlists
     track_ids = []
     for playlist_id in playlist_ids[:200]: # only get the first 200 playlists
-        #print("Fetching track ids for playlist:", playlist_id)
-        track_ids.extend(getTrackIDs(playlist_id))
+        print("Fetching track ids for playlist:", playlist_id)
+        try:
+            track_ids.extend(getTrackIDs(playlist_id))
+        except Exception as e:
+            print("Error finding the spotify playlist:", playlist_id)
+            print("Error:", str(e))
+            continue
+
+    #print(f'Numero di tracce totali prese dalle prime 200 playlist di spotify:{len(track_ids)}')
 
     # Step 3: Fetch track features
     tracks = []
@@ -122,10 +133,6 @@ def fetch_spotify_data():
     return df
 
 
-
-
-
-
 #playlists = sp.user_playlists('spotify') # gets the playlists of the user 'spotify'
 #spotify_playlist_ids = [] # list of playlist IDs
 #while playlists: # while there are still playlists to get
@@ -139,9 +146,10 @@ def fetch_spotify_data():
 #print(len(spotify_playlist_ids))
 ###
 
-
 if __name__ == "__main__":
+
     df = fetch_spotify_data()
+
 
     print("Number of rows in Spotify_tracks DataFrame:", len(df))
     print(df)
